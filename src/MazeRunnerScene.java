@@ -100,28 +100,6 @@ public class MazeRunnerScene extends Application{
 		return maze;
 	}
 	
-	private boolean[][] generateMaze()
-	{
-		// Start with a grid full of walls
-		// default of boolean is false, so false = wall
-		boolean[][] maze = new boolean[HEIGHT / BLOCKSIZE][WIDTH / BLOCKSIZE];
-		// Pick a cell, mark it as part of the maze, add walls of cell to wall list
-		int[] curr = {STARTX, STARTY};
-		maze[curr[0]][curr[1]] = true;
-		ArrayList walls = new ArrayList();
-		// add adjacent walls to stack
-		// While there are walls in the list, pick a random wall from the list
-		//	If only one of the two cells that the wall divides is visited:
-		//		Make the wall a passage and mark the unvisited cell as part of the maze
-		//		Add the neighboring walls of the cell to the wall list
-		//	Remove the wall from the list
-	}
-	
-	private ArrayList addWalls()
-	{
-		
-	}
-	
 	public static void main(String args[]) {
 		launch(args);
 	}
