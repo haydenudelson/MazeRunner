@@ -1,26 +1,52 @@
 // TO DO
 // how to declare type of ArrayList ?
 // Add unit tests
+// move character only if on path
 
 import java.util.ArrayList;
 
-public class Maze{
+import javafx.scene.Group;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+
+public class Maze extends MazeRunnerScene{
 	private int numRow; // Number of rows of cells in maze
 	private int numCol; // Number of columns of cells in maze
 	private boolean[][] layout; // which cells are walls vs. paths in maze
-	private final int STARTX = 0;
-	private final int STARTY = 0;
+	private int startX; // Start cell X pos
+	private int startY; // Start cell Y pos
+	private int blockSize;
 	
 	// Default Constructor
 	public Maze(){
-		numRow = 0;
-		numCol = 0;
+		startX = this.getStartX();
+		startY = this.getStartY();
+		blockSize = this.getBlockSize();
+		
+		numRow = this.getHeight() / this.getBlockSize();
+		numCol = this.getWidth() / this.getBlockSize();
 	}
-	
-	//Constructs Maze object with set number of cells
-	public Maze(int r, int c) {
-		numRow = r;
-		numCol = c;
+
+	public Group getLayout()
+	{
+		Group group = new Group();
+		Rectangle block;
+		for(int i = 0; i < numRow; i++)
+		{
+			for(int j = 0; j < numCol; j++)
+			{
+				 if (layout[i][j])
+				 {
+					 block = new Rectangle(j * blockSize, 
+							 i * blockSize, 
+							 blockSize, 
+							 blockSize);
+					 block.setFill(Color.WHITE);
+					 group.getChildren().add(block);
+				 }
+			}
+		}
+		return group;
 	}
 	
 	// Generates random maze
@@ -41,19 +67,23 @@ public class Maze{
 		while(walls.size() > 0) {
 			// pick a random wall from the list
 			int temp = (int) (Math.random() * walls.size());
-			int tempX = walls.get(temp)[0]
+			int tempX = walls.get(temp)[0];
+			int tempY = walls.get(temp)[1];
 			// If only one of the two cells that the wall divides is visited:
 			if(makePathHa(curr[0], curr[1])) {
-				
+				// Make the wall a passage
+				layout[tempX][tempY] = true;
+				// Mark the unvisited cell as part of the maze
+				// Add the neighboring walls of the cell to the wall list
+				addWalls(tempX, tempY, walls);
+				// Remove the wall from the list
+				walls.remove(temp);
 			}
 		}
-		//		Make the wall a passage and mark the unvisited cell as part of the maze
-		//		Add the neighboring walls of the cell to the wall list
-		//	Remove the wall from the list
 	}
 	
 	// adds cells adjacent to given cells that are walls to wall list
-	private void addWalls(int x, int y, ArrayList walls)
+	public void addWalls(int x, int y, ArrayList walls)
 	{
 		//consider each cell adjacent to the cell in question
 		for(int i = x - 1; i <= x + 1; i++) {

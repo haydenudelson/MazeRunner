@@ -18,10 +18,15 @@ public class MazeRunnerScene extends Application{
 	private final int STARTY = 0; // player starting y position
 	
 	private Circle circle;
+	private Maze maze;
 	
-	public int getBlockSize()
+	public MazeRunnerScene()
 	{
-		return BLOCKSIZE;
+		// Create player object
+		circle = new Circle(BLOCKSIZE / 2, BLOCKSIZE / 2, RADIUS);
+		circle.setFill(Color.SIENNA);
+		
+		maze = new Maze();
 	}
 	
 	public int getHeight()
@@ -34,21 +39,30 @@ public class MazeRunnerScene extends Application{
 		return WIDTH;
 	}
 	
+	public int getStartX()
+	{
+		return STARTX;
+	}
+	
+	public int getStartY()
+	{
+		return STARTY;
+	}
+	
+	public int getBlockSize()
+	{
+		return BLOCKSIZE;
+	}
+	
 	// start method holds all info on javaFX application
 	public void start(Stage mainStage){
-		
-		
-		// Create Circle object at location (50, 50) and radius 20
-		circle = new Circle(BLOCKSIZE / 2, BLOCKSIZE / 2, RADIUS);
-		circle.setFill(Color.SIENNA);
-		
 		// Creates EventHandler that calls moveCircle when keyEvent occurs
 		EventHandler<KeyEvent> eventHandler = new EventHandler<KeyEvent>( ) {
 			public void handle(KeyEvent e) {moveCircle(e);}
 		};
 		
 		// Creates a group object
-		Group root = new Group(printMaze(), circle);
+		Group root = new Group(maze.getLayout(), circle);
 	
 		// Creating a scene with group object, height, width
 		Scene scene = new Scene(root, WIDTH, HEIGHT);
