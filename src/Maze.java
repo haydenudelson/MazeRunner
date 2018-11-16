@@ -17,7 +17,7 @@ public class Maze extends MazeRunnerScene{
 	private int startY; // Start cell Y pos
 	private int blockSize;
 	
-	// Default Constructor
+// Constructor
 	public Maze(){
 		startX = this.getStartX();
 		startY = this.getStartY();
@@ -26,6 +26,15 @@ public class Maze extends MazeRunnerScene{
 		numRow = this.getHeight() / this.getBlockSize();
 		numCol = this.getWidth() / this.getBlockSize();
 	}
+	
+// Mutator Methods
+	
+	public void setLayout(boolean[][] l)
+	{
+		layout = l;
+	}
+	
+// Primary Methods
 
 	public Group getLayout()
 	{
@@ -56,11 +65,11 @@ public class Maze extends MazeRunnerScene{
 		// default of boolean is false, so false = wall
 		
 		// create ArrayList to store walls adjacent to given cell
-		ArrayList walls = new ArrayList();
+		ArrayList<int[]> walls = new ArrayList<int[]>();
 		
 		// Pick a cell, mark it as part of the maze, add walls of cell to wall list
 		// add adjacent walls to stack
-		int[] curr = {STARTX, STARTY};
+		int[] curr = {startX, startY};
 		layout[curr[0]][curr[1]] = true;
 		addWalls(curr[0], curr[1], walls);
 		// While there are walls in the list...

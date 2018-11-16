@@ -9,6 +9,9 @@ import javafx.stage.Stage;
 import javafx.event.EventHandler;
 
 public class MazeRunnerScene extends Application{
+	
+// Instance Variables
+	
 	private final int BLOCKSIZE = 30; // size of blocks in maze
 	private final int VELOCITY = 5; // velocity of player
 	private final int WIDTH = 1200; // width of screen/maze
@@ -20,6 +23,8 @@ public class MazeRunnerScene extends Application{
 	private Circle circle;
 	private Maze maze;
 	
+// Constructor
+	
 	public MazeRunnerScene()
 	{
 		// Create player object
@@ -29,14 +34,21 @@ public class MazeRunnerScene extends Application{
 		maze = new Maze();
 	}
 	
+// Access Methods
+	
+	public int getBlockSize()
+	{
+		return BLOCKSIZE;
+	}
+	
 	public int getHeight()
 	{
 		return HEIGHT;
 	}
 	
-	public int getWidth()
+	public Maze getMaze()
 	{
-		return WIDTH;
+		return maze;
 	}
 	
 	public int getStartX()
@@ -49,9 +61,9 @@ public class MazeRunnerScene extends Application{
 		return STARTY;
 	}
 	
-	public int getBlockSize()
+	public int getWidth()
 	{
-		return BLOCKSIZE;
+		return WIDTH;
 	}
 	
 	// start method holds all info on javaFX application
