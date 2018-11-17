@@ -12,16 +12,18 @@ class MazeTest {
 	@Test
 	void testAddWalls() {
 		//fail("Not yet implemented");
-		MazeRunnerScene tempMazeRunnerScene = new MazeRunnerScene();
-		Maze tempMaze = tempMazeRunnerScene.getMaze();
-		boolean[][] tempLayout = {{false, false}, {false, false}};
+		Maze tempMaze = new Maze();
+		boolean[][] tempLayout = {{false, true}, {true, false}};
 		tempMaze.setLayout(tempLayout);
 		ArrayList<int[]> actual = new ArrayList<int[]>();
 		
 		tempMaze.addWalls(0, 0, actual);
 		
-		List<String> temp = new ArrayList<String>(Arrays.asList("1", "2"));
-		ArrayList<int[]> expected = new ArrayList<int[]>(Arrays.asList({2, 3}));
+		/*ArrayList<int[]> expected = new ArrayList<int[]>();
+		int[] tempArray = {1, 1};
+		expected.add(tempArray);
+		
+		Assert.assertEquals(expected, actual);*/
 	}
 	
 

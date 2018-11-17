@@ -13,18 +13,12 @@ public class Maze extends MazeRunnerScene{
 	private int numRow; // Number of rows of cells in maze
 	private int numCol; // Number of columns of cells in maze
 	private boolean[][] layout; // which cells are walls vs. paths in maze
-	private int startX; // Start cell X pos
-	private int startY; // Start cell Y pos
-	private int blockSize;
 	
 // Constructor
 	public Maze(){
-		startX = this.getStartX();
-		startY = this.getStartY();
-		blockSize = this.getBlockSize();
-		
-		numRow = this.getHeight() / this.getBlockSize();
-		numCol = this.getWidth() / this.getBlockSize();
+		super();
+		numRow = super.HEIGHT / super.BLOCKSIZE;
+		numCol = super.WIDTH / super.BLOCKSIZE;
 	}
 	
 // Mutator Methods
@@ -46,10 +40,10 @@ public class Maze extends MazeRunnerScene{
 			{
 				 if (layout[i][j])
 				 {
-					 block = new Rectangle(j * blockSize, 
-							 i * blockSize, 
-							 blockSize, 
-							 blockSize);
+					 block = new Rectangle(j * BLOCKSIZE, 
+							 i * BLOCKSIZE, 
+							 BLOCKSIZE, 
+							 BLOCKSIZE);
 					 block.setFill(Color.WHITE);
 					 group.getChildren().add(block);
 				 }
@@ -69,7 +63,7 @@ public class Maze extends MazeRunnerScene{
 		
 		// Pick a cell, mark it as part of the maze, add walls of cell to wall list
 		// add adjacent walls to stack
-		int[] curr = {startX, startY};
+		int[] curr = {STARTX, STARTY};
 		layout[curr[0]][curr[1]] = true;
 		addWalls(curr[0], curr[1], walls);
 		// While there are walls in the list...

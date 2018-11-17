@@ -7,18 +7,19 @@ import javafx.scene.shape.*;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.event.EventHandler;
-
-public class MazeRunnerScene extends Application{
+//extends Application
+public class MazeRunnerScene {
 	
 // Instance Variables
 	
-	private final int BLOCKSIZE = 30; // size of blocks in maze
-	private final int VELOCITY = 5; // velocity of player
-	private final int WIDTH = 1200; // width of screen/maze
-	private final int HEIGHT = 800; // height of screen/maze
+	public final int BLOCKSIZE = 30; // size of blocks in maze
+	public final int WIDTH = 1200; // width of screen/maze
+	public final int HEIGHT = 800; // height of screen/maze
+	public final int STARTX = 0; // player starting x position
+	public final int STARTY = 0; // player starting y position
+	
 	private final int RADIUS = 5; // radius of player
-	private final int STARTX = 0; // player starting x position
-	private final int STARTY = 0; // player starting y position
+	private final int VELOCITY = 5; // velocity of player
 	
 	private Circle circle;
 	private Maze maze;
@@ -30,8 +31,6 @@ public class MazeRunnerScene extends Application{
 		// Create player object
 		circle = new Circle(BLOCKSIZE / 2, BLOCKSIZE / 2, RADIUS);
 		circle.setFill(Color.SIENNA);
-		
-		maze = new Maze();
 	}
 	
 // Access Methods
@@ -74,6 +73,7 @@ public class MazeRunnerScene extends Application{
 		};
 		
 		// Creates a group object
+		maze = new Maze();
 		Group root = new Group(maze.getLayout(), circle);
 	
 		// Creating a scene with group object, height, width
