@@ -8,7 +8,7 @@ import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.event.EventHandler;
 //extends Application
-public class MazeRunnerScene {
+public class MazeRunnerScene extends Application {
 	
 // Instance Variables
 	
@@ -74,6 +74,7 @@ public class MazeRunnerScene {
 		
 		// Creates a group object
 		maze = new Maze();
+		Group x = maze.getLayout();
 		Group root = new Group(maze.getLayout(), circle);
 	
 		// Creating a scene with group object, height, width
@@ -127,6 +128,6 @@ public class MazeRunnerScene {
 	}
 	
 	public static void main(String args[]) {
-		launch(args);
+		Application.launch(args);
 	}
 }
