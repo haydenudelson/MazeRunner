@@ -12,14 +12,12 @@ public class MazeRunnerScene extends Application {
 	
 // Instance Variables
 	
-	public final int BLOCKSIZE = 30; // size of blocks in maze
+	public final int BLOCKSIZE = 25; // size of blocks in maze
 	public final int WIDTH = 1200; // width of screen/maze
 	public final int HEIGHT = 800; // height of screen/maze
-	public final int STARTX = 0; // player starting x position
-	public final int STARTY = 0; // player starting y position
-	
-	private final int RADIUS = 5; // radius of player
-	private final int VELOCITY = 5; // velocity of player
+	public final int[] STARTLOC = {0, 0};
+	private final int RADIUS = 8; // radius of player
+	private final int VELOCITY = 10; // velocity of player
 	
 	private Circle circle;
 	private Maze maze;
@@ -52,12 +50,12 @@ public class MazeRunnerScene extends Application {
 	
 	public int getStartX()
 	{
-		return STARTX;
+		return STARTLOC[0];
 	}
 	
 	public int getStartY()
 	{
-		return STARTY;
+		return STARTLOC[1];
 	}
 	
 	public int getWidth()
@@ -74,8 +72,7 @@ public class MazeRunnerScene extends Application {
 		
 		// Creates a group object
 		maze = new Maze();
-		Group x = maze.getLayout();
-		Group root = new Group(maze.getLayout(), circle);
+		Group root = new Group(maze.getLayoutGraphic(), circle);
 	
 		// Creating a scene with group object, height, width
 		Scene scene = new Scene(root, WIDTH, HEIGHT);
@@ -98,33 +95,35 @@ public class MazeRunnerScene extends Application {
 	
 	private void moveCircle(KeyEvent e)
 	{
-		// if right arrow key pressed, move circle VELOCITY pixels
-		if(e.getCode() == KeyCode.RIGHT && circle.getCenterX() < WIDTH - RADIUS) circle.setCenterX(circle.getCenterX() + VELOCITY);
-		else if(e.getCode() == KeyCode.LEFT && circle.getCenterX() > RADIUS) circle.setCenterX(circle.getCenterX() - VELOCITY);
-		else if(e.getCode() == KeyCode.DOWN && circle.getCenterY() < HEIGHT - RADIUS) circle.setCenterY(circle.getCenterY() + VELOCITY);
-		else if(e.getCode() == KeyCode.UP && circle.getCenterY() > RADIUS) circle.setCenterY(circle.getCenterY() - VELOCITY);
-	}
-	
-	private Group printMaze()
-	{
-		Group maze = new Group();
-		Rectangle block;
-		for(int i = 0; i < HEIGHT / BLOCKSIZE; i++)
-		{
-			for(int j = 0; j < WIDTH / BLOCKSIZE; j++)
-			{
-				 if (Math.random() <= 0.2)
-				 {
-					 block = new Rectangle(j * BLOCKSIZE, 
-							 i * BLOCKSIZE, 
-							 BLOCKSIZE, 
-							 BLOCKSIZE);
-					 block.setFill(Color.WHITE);
-					 maze.getChildren().add(block);
-				 }
-			}
+		Cell[][] layout = maze.getLayout();
+		if(e.getCode() == KeyCode.RIGHT) {
+			if(!(layout[(int) (circle.getCenterY() / BLOCKSIZE)][(int) ((circle.getCenterX() + VELOCITY + RADIUS) / BLOCKSIZE)].getPath()))
+				circle.setCenterX((int) (circle.getCenterX() / BLOCKSIZE) * BLOCKSIZE + BLOCKSIZE - RADIUS);
+			else 
+				circle.setCenterX(circle.getCenterX() + VELOCITY);
 		}
-		return maze;
+		else if(e.getCode() == KeyCode.LEFT) {
+			if(!(layout[(int) (circle.getCenterY() / BLOCKSIZE)][(int) ((circle.getCenterX() - VELOCITY - RADIUS) / BLOCKSIZE)].getPath()))
+				circle.setCenterX((int) (circle.getCenterX() / BLOCKSIZE) * BLOCKSIZE + RADIUS);
+			else circle.setCenterX(circle.getCenterX() - VELOCITY);
+		}
+		else if(e.getCode() == KeyCode.DOWN) {
+			if(!(layout[(int) ((circle.getCenterY() + VELOCITY + RADIUS) / BLOCKSIZE)][(int) (circle.getCenterX() / BLOCKSIZE)].getPath()))
+				circle.setCenterY((int) (circle.getCenterY() / BLOCKSIZE) * BLOCKSIZE+ BLOCKSIZE - RADIUS);
+			else circle.setCenterY(circle.getCenterY() + VELOCITY);
+		}
+		else if(e.getCode() == KeyCode.UP) {
+			if(!(layout[(int) ((circle.getCenterY() - VELOCITY - RADIUS) / BLOCKSIZE)][(int) ((circle.getCenterX()) / BLOCKSIZE)].getPath()))
+				circle.setCenterY((int) (circle.getCenterY() / BLOCKSIZE) * BLOCKSIZE + RADIUS);
+			else circle.setCenterY(circle.getCenterY() - VELOCITY);
+		}
+		// if right arrow key pressed, move circle VELOCITY pixels
+		
+		if(circle.getCenterX() < RADIUS) circle.setCenterX(RADIUS);
+		else if(circle.getCenterX() >= WIDTH - RADIUS) circle.setCenterX(WIDTH - RADIUS);
+		
+		if(circle.getCenterY() < RADIUS) circle.setCenterY(RADIUS);
+		else if(circle.getCenterY() >= HEIGHT - RADIUS) circle.setCenterY(HEIGHT - RADIUS);
 	}
 	
 	public static void main(String args[]) {

@@ -13,27 +13,47 @@ import javafx.scene.shape.Rectangle;
 public class Maze extends MazeRunnerScene{
 	private int numRow; // Number of rows of cells in maze
 	private int numCol; // Number of columns of cells in maze
-	private boolean[][] layout; // which cells are walls vs paths in maze, true == path
+	private Cell[][] layout; // which cells are walls vs paths in maze, true == path
+	private int[] endPoint;
 	
 // Constructor
 	public Maze(){
 		super();
 		numRow = super.HEIGHT / super.BLOCKSIZE;
 		numCol = super.WIDTH / super.BLOCKSIZE;
-		layout = new boolean[numRow][numCol];
+		layout = new Cell[numRow][numCol];
+		for(int i = 0; i < numCol; i++) {
+			for(int j = 0; j < numRow; j++) {
+				int[] tempLoc = {i, j};
+				layout[j][i] = new Cell(false, tempLoc);
+			}
+		}
 		generateMaze();
+		findEndPoint();
 	}
 	
 // Mutator Methods
 	
-	public void setLayout(boolean[][] l)
+	public void setLayout(Cell[][] l)
 	{
 		layout = l;
 	}
 	
+// Accessor Methods	
+	
+	public Cell[][] getLayout()
+	{
+		return layout;
+	}
+	
+	public int[] getEndPoint()
+	{
+		return endPoint;
+	}
+	
 // Primary Methods
 
-	public Group getLayout()
+	public Group getLayoutGraphic()
 	{
 		Group group = new Group();
 		Rectangle block;
@@ -41,7 +61,7 @@ public class Maze extends MazeRunnerScene{
 		{
 			for(int j = 0; j < numCol; j++)
 			{
-				 if (layout[i][j])
+				 if (layout[i][j].getPath())
 				 {
 					 block = new Rectangle(j * BLOCKSIZE, 
 							 i * BLOCKSIZE, 
@@ -52,14 +72,15 @@ public class Maze extends MazeRunnerScene{
 				 }
 			}
 		}
+		Rectangle finish = new Rectangle(endPoint[0] * BLOCKSIZE, endPoint[1] * BLOCKSIZE, BLOCKSIZE, BLOCKSIZE);
+		finish.setFill(Color.RED);
+		group.getChildren().add(finish);
 		return group;
 	}
 	
 	// Generates random maze
 	private void generateMaze()
 	{
-		System.out.println(numRow);
-		System.out.println(numCol);
 		// Start with a grid full of walls
 		// default of boolean is false, so false = wall
 		
@@ -68,154 +89,78 @@ public class Maze extends MazeRunnerScene{
 		
 		// Pick a cell, mark it as part of the maze, add walls of cell to wall list
 		// add adjacent walls to stack
-		layout[STARTY][STARTX] = true;
-		addWalls(STARTX, STARTY, walls);
+		layout[STARTLOC[1]][STARTLOC[0]].setPath(true);
+		layout[STARTLOC[1]][STARTLOC[0]].setParent(null);
+		addWalls(STARTLOC, walls);
 		// While there are walls in the list...
-		int tempCount = 0;
 		while(walls.size() > 0) {
 			// pick a random wall from the list
 			int temp = (int) (Math.random() * walls.size());
-			int tempX = walls.get(temp)[0];
-			int tempY = walls.get(temp)[1];
-			// If it's only adjacent to one path
-			if(makePathHa(tempX, tempY)) {
+			int[] tempLoc = walls.get(temp);
+			Cell tempCell = layout[tempLoc[1]][tempLoc[0]];
+			// If the cell on the other side of the wall is not part of the maze, get rid of wall and make them both part of maze
+			if(makePathHa(tempCell)) {
 				// Make the wall a passage
-				layout[tempY][tempX] = true;
+				tempCell.setPath(true);
 				// Mark the unvisited cell as part of the maze
+				int[] opposite = tempCell.getOpposite();
+				Cell opp = layout[opposite[1]][opposite[0]];
+				opp.setParent(tempLoc);
+				opp.setPath(true);
 				// Add the neighboring walls of the cell to the wall list
-				addWalls(tempX, tempY, walls);
-				// Remove the wall from the list
+				addWalls(opposite, walls);
 			}
+			// Remove the wall from the list
 			walls.remove(temp);
-			tempCount++;
-			System.out.println("Number of Loops: " + tempCount);
+		}
+	}
+	
+	private void findEndPoint() {
+		for(int i = numCol - 1; i >= 0; i--) {
+			for(int j = numRow - 1; j >= 0; j--) {
+				if (layout[j][i].getPath()) {
+					endPoint = new int[2];
+					endPoint[0] = i;
+					endPoint[1] = j;
+					return;
+				}
+			}
 		}
 	}
 	
 	// adds cells adjacent to given cells that are walls to wall list
-	public void addWalls(int x, int y, ArrayList walls)
+	public void addWalls(int[] loc, ArrayList walls)
 	{
-		int[] temp1 = {x - 1, y};
-		int[] temp2 = {x + 1, y};
-		int[] temp3 = {x, y - 1};
-		int[] temp4 = {x, y + 1};
+		int x = loc[0];
+		int y = loc[1];
+		int[][] neighbors = { {x - 1, y}, 
+							  {x + 1, y},
+							  {x, y - 1},
+							  {x, y + 1}};
 		
-		if(x <= 0 && y <= 0) {
-			if (!layout[y][x + 1]) walls.add(temp2);
-			if (!layout[y + 1][x]) walls.add(temp4);
+		for(int i = 0; i < 4; i++) {
+			try {
+				Cell temp = layout[neighbors[i][1]][neighbors[i][0]];
+				if(!(temp.getPath())) {
+					walls.add(temp.getLocation());
+					temp.setParent(loc);
+					temp.setOpposite();
+				}
+			}
+			catch (Exception ArrayIndexOutOfBoundsException) {
+				continue;
+			}
 		}
-		else if (x <= 0 && y >= (numRow - 1)) {
-			if (!layout[y][x + 1]) walls.add(temp2);
-			if (!layout[y - 1][x]) walls.add(temp3);
-		}
-		else if (x >= (numCol - 1) && y <= 0) {
-			if (!layout[y][x - 1]) walls.add(temp1);
-			if (!layout[y + 1][x]) walls.add(temp4);
-		}
-		else if (x >= (numCol - 1) && y >= (numRow - 1)) {
-			if (!layout[y][x - 1]) walls.add(temp1);
-			if (!layout[y - 1][x]) walls.add(temp3);
-		}
-		else if (x <= 0) {
-			if (!layout[y][x + 1]) walls.add(temp2);
-			if (!layout[y - 1][x]) walls.add(temp3);
-			if (!layout[y + 1][x]) walls.add(temp4);
-		}
-		else if (y <= 0) {
-			if (!layout[y][x - 1]) walls.add(temp1);
-			if (!layout[y][x + 1]) walls.add(temp2);
-			if (!layout[y + 1][x]) walls.add(temp4);
-		}
-		else if (x >= (numCol - 1)) {
-			walls.add(temp1);
-			if (!layout[y - 1][x]) walls.add(temp3);
-			if (!layout[y + 1][x]) walls.add(temp4);
-		}
-		else if (y >= (numRow - 1)) {
-			walls.add(temp1);
-			if (!layout[y][x + 1]) walls.add(temp2);
-			if (!layout[y - 1][x]) walls.add(temp3);
-		}
-		else {
-			walls.add(temp1);
-			if (!layout[y][x + 1]) walls.add(temp2);
-			if (!layout[y - 1][x]) walls.add(temp3);
-			if (!layout[y + 1][x]) walls.add(temp4);
-		} 
 	}
 	
-	// checks to see if more than one adjacent cell is a path
-	// If not, returns true
-	private boolean makePathHa(int x, int y){
-		int pathCount = 0;
-		
-		if (x <= 0 && y <= 0) {
-			if(layout[y][x + 1]) pathCount++;
-			if(layout[y + 1][x]) pathCount++;
-			if (pathCount > 1) return false;
+	// return true if
+	private boolean makePathHa(Cell t){
+		try {
+			if(layout[t.getOpposite()[1]][t.getOpposite()[0]].getPath()) return false;
 			else return true;
 		}
-		
-		else if (x <= 0 && y >= (numRow - 1)) {
-			if(layout[y][x + 1]) pathCount++;
-			if(layout[y - 1][x]) pathCount++;
-			if (pathCount > 1) return false;
-			else return true;
-		}	
-		
-		else if (x >= (numCol - 1) && y <= 0) {
-			if(layout[y][x - 1]) pathCount++;
-			if(layout[y + 1][x]) pathCount++;
-			if (pathCount > 1) return false;
-			else return true;
-		}
-		
-		else if (x >= (numCol - 1) && y >= (numRow - 1)) {
-			if(layout[y][x - 1]) pathCount++;
-			if(layout[y - 1][x]) pathCount++;
-			if (pathCount > 1) return false;
-			else return true;
-		}
-		
-		else if (x <= 0) {
-			if(layout[y][x + 1]) pathCount++;
-			if(layout[y + 1][x]) pathCount++;
-			if(layout[y - 1][x]) pathCount++;
-			if(pathCount > 1) return false;
-			else return true;
-		}
-		
-		else if (y <= 0) {
-			if(layout[y][x + 1]) pathCount++;
-			if(layout[y + 1][x]) pathCount++;
-			if(layout[y][x - 1]) pathCount++;
-			if(pathCount > 1) return false;
-			else return true;
-		}
-		
-		else if (x >= (numCol - 1)) {
-			if(layout[y - 1][x]) pathCount++;
-			if(layout[y + 1][x]) pathCount++;
-			if(layout[y][x - 1]) pathCount++;
-			if(pathCount > 1) return false;
-			else return true;
-		}
-		
-		else if (y >= (numRow - 1)) {
-			if(layout[y - 1][x]) pathCount++;
-			if(layout[y][x + 1]) pathCount++;
-			if(layout[y][x - 1]) pathCount++;
-			if(pathCount > 1) return false;
-			else return true;
-		}
-		
-		else {
-			if(layout[y - 1][x]) pathCount++;
-			if(layout[y][x + 1]) pathCount++;
-			if(layout[y][x - 1]) pathCount++;
-			if(layout[y + 1][x]) pathCount++;
-			if(pathCount > 1) return false;
-			else return true;
+		catch (Exception ArrayIndexOutOfBoundsException) {
+			return false;
 		}
 	}
 }
